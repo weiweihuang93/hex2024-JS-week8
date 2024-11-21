@@ -68,7 +68,7 @@ let finalTotal = 0;
 function getCart(){
     axios.get(`${customerApi}/carts`)
     .then((res) => {
-        console.log(res);
+        // console.log(res);
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
         renderCart();
@@ -98,7 +98,7 @@ function addCart(id){
       }
       axios.post(`${customerApi}/carts`, data)
       .then((res) => {
-          console.log(res);
+        //   console.log(res);
           cartData = res.data.carts;
           finalTotal = res.data.finalTotal;
           renderCart()
@@ -128,7 +128,10 @@ function renderCart(){
                             </div>
                         </td>
                         <td>NT$${item.product.price}</td>
-                        <td>${item.quantity}</td>
+                        <td>
+                            <button type="button" class="minBtn"> - </button> ${item.quantity} 
+                            <button type="button" class="addBtn"> + </button>
+                        </td>
                         <td>NT$${item.quantity * item.product.price}</td>
                         <td class="discardBtn">
                             <a href="#" class="material-icons discardBtnX">
@@ -166,7 +169,7 @@ shoppingCartTableFoot.addEventListener('click', (e) => {
 function deleteCart(){
     axios.delete(`${customerApi}/carts`)
     .then((res) => {
-        console.log(res);
+        // console.log(res);
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
         renderCart();
@@ -177,19 +180,63 @@ function deleteCart(){
     })
 }
 
-// 刪除單一品項>渲染購物車
 shoppingCartTableBody.addEventListener('click', (e) => {
+    // 刪除單一品項>渲染購物車
     e.preventDefault();
     // console.log(e.target.classList.contains('discardBtnX'))
     if (e.target.classList.contains('discardBtnX')){
-        delId = e.target.closest('tr').dataset.id;
-        deleteIdCart(delId);
+        const Id = e.target.closest('tr').dataset.id;
+        deleteIdCart(Id);
+    }
+
+
+    if (e.target.classList.contains('addBtn') || e.target.classList.contains('minBtn')){
+        
+        const Id = e.target.closest('tr').dataset.id;
+
+        // 找到對應的商品
+        productDataQty = cartData.find(item => item.id === Id);
+        let qty = productDataQty.quantity;
+
+        if (e.target.classList.contains('addBtn')){
+            qty += 1;
+        }
+
+        if (e.target.classList.contains('minBtn')){
+            qty -= 1;
+            if (qty < 1){
+                deleteIdCart(Id);
+                return;
+            }
+        }
+        updateCart(Id, qty)
     }
 })
 function deleteIdCart(id){
     axios.delete(`${customerApi}/carts/${id}`)
     .then((res) => {
-        console.log(res);
+        // console.log(res);
+        cartData = res.data.carts;
+        finalTotal = res.data.finalTotal;
+        renderCart();
+    
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+// 加入 - + 按鈕
+function updateCart(id, qty){
+    const data = {
+        "data": {
+          "id": id,
+          "quantity": qty
+        }
+      };
+    axios.patch(`${customerApi}/carts`, data)
+    .then((res) => {
+        // console.log(res);
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
         renderCart();
