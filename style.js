@@ -68,7 +68,7 @@ let finalTotal = 0;
 function getCart(){
     axios.get(`${customerApi}/carts`)
     .then((res) => {
-        // console.log(res);
+        console.log(res);
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
         renderCart();
@@ -120,7 +120,7 @@ function renderCart(){
 
     let str = '';
     cartData.forEach(item => {
-        str += `<tr>
+        str += `<tr data-id="${item.id}">
                         <td>
                             <div class="cardItem-title">
                                 <img src="${item.product.images}" alt="">
@@ -131,7 +131,7 @@ function renderCart(){
                         <td>${item.quantity}</td>
                         <td>NT$${item.quantity * item.product.price}</td>
                         <td class="discardBtn">
-                            <a href="#" class="material-icons">
+                            <a href="#" class="material-icons discardBtnX">
                                 clear
                             </a>
                         </td>
@@ -177,4 +177,25 @@ function deleteCart(){
     })
 }
 
-// 刪除單一品項
+// 刪除單一品項>渲染購物車
+shoppingCartTableBody.addEventListener('click', (e) => {
+    e.preventDefault();
+    // console.log(e.target.classList.contains('discardBtnX'))
+    if (e.target.classList.contains('discardBtnX')){
+        delId = e.target.closest('tr').dataset.id;
+        deleteIdCart(delId);
+    }
+})
+function deleteIdCart(id){
+    axios.delete(`${customerApi}/carts/${id}`)
+    .then((res) => {
+        console.log(res);
+        cartData = res.data.carts;
+        finalTotal = res.data.finalTotal;
+        renderCart();
+    
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
