@@ -64,11 +64,13 @@ function filterProduct(){
 // 取得購物車資料>渲染購物車>加入購物車>渲染購物車
 // 取得購物車資料
 let cartData = [];
+let finalTotal = 0;
 function getCart(){
     axios.get(`${customerApi}/carts`)
     .then((res) => {
         // console.log(res);
         cartData = res.data.carts;
+        finalTotal = res.data.finalTotal;
         renderCart();
     
     })
@@ -96,8 +98,9 @@ function addCart(id){
       }
       axios.post(`${customerApi}/carts`, data)
       .then((res) => {
-        //   console.log(res);
+          console.log(res);
           cartData = res.data.carts;
+          finalTotal = res.data.finalTotal;
           renderCart()
       })
       .catch((err) => {
@@ -109,6 +112,12 @@ function addCart(id){
 const shoppingCartTableBody = document.querySelector('.shoppingCart-table tbody');
 
 function renderCart(){
+    if (cartData.length === 0){
+        shoppingCartTableBody.innerHTML = '目前購物車無任何品項';
+        shoppingCartTableFoot.innerHTML = '';
+        return;
+    }
+
     let str = '';
     cartData.forEach(item => {
         str += `<tr>
@@ -129,6 +138,43 @@ function renderCart(){
                     </tr>`;
     })
     shoppingCartTableBody.innerHTML = str;
+
+    shoppingCartTableFoot.innerHTML = `<tr>
+                        <td>
+                            <a href="#" class="discardAllBtn">刪除所有品項</a>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <p>總金額</p>
+                        </td>
+                        <td>NT$${finalTotal}</td>
+                    </tr>`;
 }
 
-//     刪除品項>單一、所有
+// 刪除品項>單一、所有>渲染購物車
+// 刪除所有品項>渲染購物車
+const shoppingCartTableFoot = document.querySelector('.shoppingCart-table tfoot');
+// const discardAllBtn = document.querySelector('.discardAllBtn');
+shoppingCartTableFoot.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (e.target.classList.contains('discardAllBtn')){
+        deleteCart(); // "購物車產品已全部清空。
+    }
+})
+
+function deleteCart(){
+    axios.delete(`${customerApi}/carts`)
+    .then((res) => {
+        console.log(res);
+        cartData = res.data.carts;
+        finalTotal = res.data.finalTotal;
+        renderCart();
+    
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+// 刪除單一品項
