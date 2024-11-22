@@ -246,3 +246,83 @@ function updateCart(id, qty){
         console.log(err);
     })
 }
+
+// 送出購買訂單>表單驗證validate>清空購物車
+const orderInfoForm = document.querySelector('.orderInfo-form');
+const orderInfoBtn = document.querySelector('.orderInfo-btn');
+orderInfoBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    sendOrder();
+})
+
+// 送出購買訂單>清空購物車
+const customerName = document.querySelector('#customerName');
+const customerPhone = document.querySelector('#customerPhone');
+const customerEmail = document.querySelector('#customerEmail');
+const customerAddress = document.querySelector('#customerAddress');
+const tradeWay = document.querySelector('#tradeWay');
+tradeWay.addEventListener('change', () => {
+})
+
+function sendOrder(){
+    if (cartData.length === 0){
+        alert('目前購物車無任何品項');
+        return;
+    }
+    if (checkForm()){
+        return;
+    }
+    const data = {
+        "data": {
+          "user": {
+            "name": customerName.value.trim(),
+            "tel": customerPhone.value.trim(),
+            "email": customerEmail.value.trim(),
+            "address": customerAddress.value.trim(),
+            "payment": tradeWay.value
+          }
+        }
+    }
+    axios.post(`${customerApi}/orders`, data)
+    .then((res) => {
+        console.log(res);
+        alert('已送出預訂資料');
+        cartData = [];
+        renderCart();
+        orderInfoForm.reset();
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+// 表單驗證
+function checkForm(){
+    const constraints = {
+        姓名: {
+            presence: { message: "^必填" },
+        },
+        電話: {
+            presence: { message: "^必填" },
+        },
+        Email: {
+            presence: { message: "^必填" },
+            email: { message: "^請輸入正確的信箱格式" },
+        },
+        寄送地址: {
+            presence: { message: "^必填" },
+        },
+    };
+
+    const error = validate(orderInfoForm, constraints);
+    // console.log(error);
+    if (error) {
+        // 將錯誤訊息以 alert 顯示
+        let errorMessages = '';
+        for (const field in error){
+            errorMessages += `${field}: 必填!\n`
+        }
+        alert(`必填欄位需填寫:\n${errorMessages}`)
+    }
+    return error ? true : false;
+}
