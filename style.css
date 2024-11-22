@@ -834,3 +834,9 @@ body {
   display: none;
 }
 /*# sourceMappingURL=all.css.map */
+
+/* 加入購物車 */
+.disabled{
+  pointer-events: none;
+  opacity: 0.5;
+}
