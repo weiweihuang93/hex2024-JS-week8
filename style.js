@@ -2,8 +2,6 @@ const baseUrl = 'https://livejs-api.hexschool.io';
 const apiPath = 'weiweirobot'
 const customerApi = `${baseUrl}/api/livejs/v1/customer/${apiPath}`
 
-// https://livejs-api.hexschool.io/api/livejs/v1/customer/weiweirobot/products
-
 // 初始化
 function init(){
     getProduct();
@@ -85,6 +83,9 @@ productWrap.addEventListener('click', (e) => {
     // console.log(e.target)
     // console.log(e.target.classList.contains('addCardBtn'))
     if (e.target.classList.contains('addCardBtn')){
+        // 加入購物車時disabled
+        e.target.classList.add('disabled');
+        e.target.setAttribute('disabled', 'true');
         // console.log(e.target.dataset.id)
         addCart(e.target.dataset.id);
     }
@@ -101,7 +102,10 @@ function addCart(id){
         //   console.log(res);
           cartData = res.data.carts;
           finalTotal = res.data.finalTotal;
-          renderCart()
+          renderCart();
+
+        // sweetalert2
+        Swal.fire("成功加入購物車!");
       })
       .catch((err) => {
           console.log(err);
@@ -134,7 +138,7 @@ function renderCart(){
                         </td>
                         <td>NT$${item.quantity * item.product.price}</td>
                         <td class="discardBtn">
-                            <a href="#" class="material-icons discardBtnX">
+                            <a href="#" class="material-icons discardBtnX" data-id="${item.product.id}">
                                 clear
                             </a>
                         </td>
@@ -167,17 +171,55 @@ shoppingCartTableFoot.addEventListener('click', (e) => {
 })
 
 function deleteCart(){
-    axios.delete(`${customerApi}/carts`)
-    .then((res) => {
-        // console.log(res);
-        cartData = res.data.carts;
-        finalTotal = res.data.finalTotal;
-        renderCart();
+    // sweetalert2
+    Swal.fire({
+        title: "確定要刪除所有品項嗎?",
+        text: "((((；゜Д゜)))",
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "取消刪除",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "確認刪除"
+      }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(`${customerApi}/carts`)
+            .then((res) => {
+                // console.log(res);
+                cartData = res.data.carts;
+                finalTotal = res.data.finalTotal;
+                renderCart();
+
+                // 清空購物車後，恢復所有商品的加入購物車按鈕
+                const addCardBtnAll = document.querySelectorAll('.addCardBtn');
+                addCardBtnAll.forEach(btn => {
+                    btn.classList.remove('disabled');
+                    btn.removeAttribute('disabled');
+                });
     
-    })
-    .catch((err) => {
-        console.log(err);
-    })
+                Swal.fire({
+                    title: "已刪除！",
+                    text: "您的購物車已清空。",
+                    icon: "success"
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+});
+
+    // axios.delete(`${customerApi}/carts`)
+    // .then((res) => {
+    //     // console.log(res);
+    //     cartData = res.data.carts;
+    //     finalTotal = res.data.finalTotal;
+    //     renderCart();
+    
+    // })
+    // .catch((err) => {
+    //     console.log(err);
+    // })
 }
 
 shoppingCartTableBody.addEventListener('click', (e) => {
@@ -185,17 +227,23 @@ shoppingCartTableBody.addEventListener('click', (e) => {
     e.preventDefault();
     // console.log(e.target.classList.contains('discardBtnX'))
     if (e.target.classList.contains('discardBtnX')){
-        const Id = e.target.closest('tr').dataset.id;
-        deleteIdCart(Id);
+        const cartId = e.target.closest('tr').dataset.id;
+        deleteIdCart(cartId);
+
+        // 移除單一品項後，恢復商品的加入購物車按鈕
+        const productId = e.target.dataset.id;
+        toDisabledBtn(productId);
     }
 
 
     if (e.target.classList.contains('addBtn') || e.target.classList.contains('minBtn')){
         
-        const Id = e.target.closest('tr').dataset.id;
+        const cartId = e.target.closest('tr').dataset.id;
+        // 移除單一品項後，恢復商品的加入購物車按鈕
+        const productId = e.target.closest('tr').querySelector('.discardBtnX').dataset.id;
 
         // 找到對應的商品
-        productDataQty = cartData.find(item => item.id === Id);
+        const productDataQty = cartData.find(item => item.id === cartId);
         let qty = productDataQty.quantity;
 
         if (e.target.classList.contains('addBtn')){
@@ -205,11 +253,12 @@ shoppingCartTableBody.addEventListener('click', (e) => {
         if (e.target.classList.contains('minBtn')){
             qty -= 1;
             if (qty < 1){
-                deleteIdCart(Id);
+                deleteIdCart(cartId);
+                toDisabledBtn(productId);
                 return;
             }
         }
-        updateCart(Id, qty)
+        updateCart(cartId, qty)
     }
 })
 function deleteIdCart(id){
@@ -219,6 +268,9 @@ function deleteIdCart(id){
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
         renderCart();
+
+        // sweetalert2
+        Swal.fire("已移除品項!");
     
     })
     .catch((err) => {
@@ -285,11 +337,20 @@ function sendOrder(){
     }
     axios.post(`${customerApi}/orders`, data)
     .then((res) => {
-        console.log(res);
-        alert('已送出預訂資料');
+        // console.log(res);
+        // alert('已送出預訂資料');
+        // sweetalert2
+        Swal.fire("已送出預訂資料!");
         cartData = [];
         renderCart();
         orderInfoForm.reset();
+
+        // 清空購物車後，恢復所有商品的加入購物車按鈕
+        const addCardBtnAll = document.querySelectorAll('.addCardBtn');
+        addCardBtnAll.forEach(btn => {
+            btn.classList.remove('disabled');
+            btn.removeAttribute('disabled');
+        });
     })
     .catch((err) => {
         console.log(err);
@@ -320,9 +381,22 @@ function checkForm(){
         // 將錯誤訊息以 alert 顯示
         let errorMessages = '';
         for (const field in error){
-            errorMessages += `${field}: 必填!\n`
+            errorMessages += `${field}: <span style="color: #C72424">必填!</span>\n`;
         }
-        alert(`必填欄位需填寫:\n${errorMessages}`)
+        // alert(`必填欄位需填寫:\n${errorMessages}`)
+        // sweetalert2
+        Swal.fire(`必填欄位需填寫:\n${errorMessages}`);
     }
     return error ? true : false;
+}
+
+// 移除單一品項後，恢復商品的加入購物車按鈕
+function toDisabledBtn(id){
+    const addCardBtnAll = document.querySelectorAll('.addCardBtn');
+    addCardBtnAll.forEach(btn => {
+        if (btn.dataset.id === id){
+            btn.classList.remove('disabled');
+            btn.removeAttribute('disabled');
+        }
+    });
 }
