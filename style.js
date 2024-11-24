@@ -31,8 +31,8 @@ function renderProduct(data){
                 <img src="${item.images}" alt="">
                 <a href="#" class="addCardBtn" data-id="${item.id}">加入購物車</a>
                 <h3>${item.title}</h3>
-                <del class="originPrice">NT$${item.origin_price}</del>
-                <p class="nowPrice">NT$${item.price}</p>
+                <del class="originPrice">NT$${formatNumber(item.origin_price)}</del>
+                <p class="nowPrice">NT$${formatNumber(item.price)}</p>
             </li>`;
     })
     productWrap.innerHTML = str;
@@ -127,12 +127,12 @@ function renderCart(){
                                 <p>${item.product.title}</p>
                             </div>
                         </td>
-                        <td>NT$${item.product.price}</td>
+                        <td>NT$${formatNumber(item.product.price)}</td>
                         <td>
                             <button type="button" class="minBtn"> - </button> ${item.quantity} 
                             <button type="button" class="addBtn"> + </button>
                         </td>
-                        <td>NT$${item.quantity * item.product.price}</td>
+                        <td>NT$${formatNumber(item.quantity * item.product.price)}</td>
                         <td class="discardBtn">
                             <a href="#" class="material-icons discardBtnX" data-id="${item.product.id}">
                                 clear
@@ -151,7 +151,7 @@ function renderCart(){
                         <td>
                             <p>總金額</p>
                         </td>
-                        <td>NT$${finalTotal}</td>
+                        <td>NT$${formatNumber(finalTotal)}</td>
                     </tr>`;
 }
 
@@ -395,4 +395,11 @@ function toDisabledBtn(id){
             btn.removeAttribute('disabled');
         }
     });
+}
+
+// 千位分隔符
+function formatNumber(number) {
+    let parts = number.toString().split('.'); // 分割整數和小數部分
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 格式化整數部分
+    return parts.length > 1 ? parts.join('.') : parts[0]; // 拼接小數部分
 }
