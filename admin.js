@@ -14,7 +14,6 @@ function getOrder(){
         }
     })
     .then((res) => {
-        console.log('getOrder', res.data.orders);
         orderData = res.data.orders;
 
         // 排序訂單日期
@@ -69,12 +68,9 @@ function renderOrder(){
 
 orderPageTableBody.addEventListener('click', (e) => {
     e.preventDefault();
-    // console.log(e.target)
-
     const id = e.target.closest('tr').dataset.id;
     // 清除訂單>單一、全部訂單>渲染訂單資料
     if (e.target.classList.contains('delSingleOrder-Btn')){
-        // console.log(e.target.closest('tr').dataset.id)
         deleteIdOrder(id);
     }
     
@@ -97,7 +93,6 @@ function deleteAllOrder(){
         }
     })
     .then((res) => {
-        // console.log('deleteAllOrder', res);
         orderData = res.data.orders;
         renderOrder();
 
@@ -117,7 +112,6 @@ function deleteIdOrder(id){
         }
     })
     .then((res) => {
-        // console.log('deleteIdOrder', res);
         orderData = res.data.orders;
         renderOrder();
 
@@ -153,7 +147,6 @@ function updateOrderStatus(id){
         }
     })
     .then((res) => {
-        // console.log('updateOrderStatus', res);
         orderData = res.data.orders;
         renderOrder();
     })
@@ -178,7 +171,6 @@ categoryRevenueBtn.addEventListener('click', () => {
 function calcProductCategory(){
     const revenueResultObj = {};
     orderData.forEach(order => {
-        // console.log(order);
         order.products.forEach(product => {
             if (revenueResultObj[product.category] === undefined){
                 revenueResultObj[product.category] = product.price * product.quantity;
@@ -187,8 +179,6 @@ function calcProductCategory(){
             }
         })
     })
-    console.log('revenueResultObj', revenueResultObj);
-    // return Object.entries(revenueResultObj);
     renderChart(Object.entries(revenueResultObj));
 }
 
@@ -196,7 +186,6 @@ function calcProductCategory(){
 function calcProductTitle(){
     const revenueResultObj = {};
     orderData.forEach(order => {
-        // console.log(order);
         order.products.forEach(product => {
             if (revenueResultObj[product.title] === undefined){
                 revenueResultObj[product.title] = product.price * product.quantity;
@@ -205,14 +194,12 @@ function calcProductTitle(){
             }
         })
     })
-    console.log('revenueResultObj', revenueResultObj);
     // return Object.entries(revenueResultObj);
     // renderChart(Object.entries(revenueResultObj));
 
     // 排序並找出前三筆 其他統整為「其它」
     const resultArr = Object.entries(revenueResultObj);
     const sortResultArr = resultArr.sort((a,b) => b[1] - a[1]);
-    console.log('sortResultArr', sortResultArr)
     const rankOfThree = [];
     let otherTotal = 0;
     sortResultArr.forEach((product, index) => {
