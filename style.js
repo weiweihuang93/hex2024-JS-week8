@@ -1,7 +1,3 @@
-const baseUrl = 'https://livejs-api.hexschool.io';
-const apiPath = 'weiweirobot'
-const customerApi = `${baseUrl}/api/livejs/v1/customer/${apiPath}`
-
 // 初始化
 function init(){
     getProduct();
@@ -21,7 +17,7 @@ function getProduct(){
     
     })
     .catch((err) => {
-        console.log(err);
+        console.log('getProduct', err);
     })
 }
 
@@ -73,7 +69,7 @@ function getCart(){
     
     })
     .catch((err) => {
-        console.log(err);
+        console.log('getCart', err);
     })
 }
 
@@ -108,7 +104,7 @@ function addCart(id){
         Swal.fire("成功加入購物車!");
       })
       .catch((err) => {
-          console.log(err);
+          console.log('addCart', err);
       })
 }
 
@@ -204,7 +200,7 @@ function deleteCart(){
                 });
             })
             .catch((err) => {
-                console.log(err);
+                console.log('deleteCart', err);
             });
     }
 });
@@ -274,7 +270,7 @@ function deleteIdCart(id){
     
     })
     .catch((err) => {
-        console.log(err);
+        console.log('deleteIdCart', err);
     })
 }
 
@@ -295,7 +291,7 @@ function updateCart(id, qty){
     
     })
     .catch((err) => {
-        console.log(err);
+        console.log('updateCart', err);
     })
 }
 
@@ -353,7 +349,7 @@ function sendOrder(){
         });
     })
     .catch((err) => {
-        console.log(err);
+        console.log('sendOrder', err);
     })
 }
 
