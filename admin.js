@@ -22,6 +22,7 @@ function getOrder(){
         renderOrder();
         // / 在渲染訂單後再取得並顯示圖表 預設顯示類別圖表
         calcProductCategory();
+        calcProductTitle();
     })
     .catch((err) => {
         console.log('getOrder', err);
@@ -98,6 +99,7 @@ function deleteAllOrder(){
 
         // 刪除訂單後，重新渲染圖表
         calcProductCategory();  // 更新圖表
+        calcProductTitle(); // 更新圖表
     })
     .catch((err) => {
         console.log('deleteAllOrder', err);
@@ -113,10 +115,14 @@ function deleteIdOrder(id){
     })
     .then((res) => {
         orderData = res.data.orders;
+
+        // 排序訂單日期
+        orderData.sort((a,b) => b.createdAt - a.createdAt);
         renderOrder();
 
         // 刪除訂單後，重新渲染圖表
-        calcproductCategory();  // 更新圖表
+        calcProductCategory();  // 更新圖表
+        calcProductTitle(); // 更新圖表
     })
     .catch((err) => {
         console.log('deleteIdOrder', err);
@@ -162,11 +168,11 @@ const productRevenueBtn = document.querySelector('#productRevenueBtn');
 const categoryRevenueBtn = document.querySelector('#categoryRevenueBtn');
 productRevenueBtn.addEventListener('click', () => {
     calcProductTitle();
-    sectionTitle.textContent = '全產品類別營收比重';
+    sectionTitle.textContent = '全品項營收比重';
 })
 categoryRevenueBtn.addEventListener('click', () => {
     calcProductCategory();
-    sectionTitle.textContent = '全品項營收比重';
+    sectionTitle.textContent = '全產品類別營收比重';
 })
 
 // 圖表呈現>全品項營收比重、全產品類別營收比重(共有：床架、收納、窗簾)
