@@ -808,3 +808,11 @@ body {
   display: none;
 }
 /*# sourceMappingURL=all.css.map */
+
+/* // 根據訂單的 paid 屬性動態選擇狀態顏色 */
+.status-processed{
+  color: green !important;
+}
+.status-unprocessed{
+  color: red !important;
+}
