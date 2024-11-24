@@ -11,7 +11,6 @@ let productData = [];
 function getProduct(){
     axios.get(`${customerApi}/products`)
     .then((res) => {
-        // console.log(res);
         productData = res.data.products;
         renderProduct(productData);
     
@@ -41,7 +40,6 @@ function renderProduct(data){
 // 選單篩選
 const productSelect = document.querySelector('.productSelect');
 productSelect.addEventListener('change', () => {
-    // console.log(productSelect.value);
     filterProduct();
 })
 
@@ -62,7 +60,6 @@ let finalTotal = 0;
 function getCart(){
     axios.get(`${customerApi}/carts`)
     .then((res) => {
-        // console.log(res);
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
         renderCart();
@@ -76,13 +73,10 @@ function getCart(){
 // 加入購物車
 productWrap.addEventListener('click', (e) => {
     e.preventDefault();
-    // console.log(e.target)
-    // console.log(e.target.classList.contains('addCardBtn'))
     if (e.target.classList.contains('addCardBtn')){
         // 加入購物車時disabled
         e.target.classList.add('disabled');
         e.target.setAttribute('disabled', 'true');
-        // console.log(e.target.dataset.id)
         addCart(e.target.dataset.id);
     }
 })
@@ -95,7 +89,6 @@ function addCart(id){
       }
       axios.post(`${customerApi}/carts`, data)
       .then((res) => {
-        //   console.log(res);
           cartData = res.data.carts;
           finalTotal = res.data.finalTotal;
           renderCart();
@@ -181,7 +174,6 @@ function deleteCart(){
         if (result.isConfirmed) {
             axios.delete(`${customerApi}/carts`)
             .then((res) => {
-                // console.log(res);
                 cartData = res.data.carts;
                 finalTotal = res.data.finalTotal;
                 renderCart();
@@ -203,25 +195,12 @@ function deleteCart(){
                 console.log('deleteCart', err);
             });
     }
-});
-
-    // axios.delete(`${customerApi}/carts`)
-    // .then((res) => {
-    //     // console.log(res);
-    //     cartData = res.data.carts;
-    //     finalTotal = res.data.finalTotal;
-    //     renderCart();
-    
-    // })
-    // .catch((err) => {
-    //     console.log(err);
-    // })
+})
 }
 
 shoppingCartTableBody.addEventListener('click', (e) => {
     // 刪除單一品項>渲染購物車
     e.preventDefault();
-    // console.log(e.target.classList.contains('discardBtnX'))
     if (e.target.classList.contains('discardBtnX')){
         const cartId = e.target.closest('tr').dataset.id;
         deleteIdCart(cartId);
@@ -260,7 +239,6 @@ shoppingCartTableBody.addEventListener('click', (e) => {
 function deleteIdCart(id){
     axios.delete(`${customerApi}/carts/${id}`)
     .then((res) => {
-        // console.log(res);
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
         renderCart();
@@ -284,7 +262,6 @@ function updateCart(id, qty){
       };
     axios.patch(`${customerApi}/carts`, data)
     .then((res) => {
-        // console.log(res);
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
         renderCart();
@@ -333,7 +310,6 @@ function sendOrder(){
     }
     axios.post(`${customerApi}/orders`, data)
     .then((res) => {
-        // console.log(res);
         // alert('已送出預訂資料');
         // sweetalert2
         Swal.fire("已送出預訂資料!");
@@ -372,7 +348,6 @@ function checkForm(){
     };
 
     const error = validate(orderInfoForm, constraints);
-    // console.log(error);
     if (error) {
         // 將錯誤訊息以 alert 顯示
         let errorMessages = '';
