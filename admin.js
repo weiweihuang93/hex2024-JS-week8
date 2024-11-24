@@ -22,7 +22,6 @@ function getOrder(){
         renderOrder();
         // / 在渲染訂單後再取得並顯示圖表 預設顯示類別圖表
         calcProductCategory();
-        calcProductTitle();
     })
     .catch((err) => {
         console.log('getOrder', err);
