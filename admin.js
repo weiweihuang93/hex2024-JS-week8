@@ -17,7 +17,7 @@ function getOrder(){
         orderData = res.data.orders;
 
         // 排序訂單日期
-        orderData.sort((a,b) => a.createdAt - b.createdAt);
+        orderData.sort((a,b) => b.createdAt - a.createdAt);
 
         renderOrder();
         // / 在渲染訂單後再取得並顯示圖表 預設顯示類別圖表
@@ -148,6 +148,8 @@ function updateOrderStatus(id){
     })
     .then((res) => {
         orderData = res.data.orders;
+        // 在更新後重新排序
+        orderData.sort((a, b) => b.createdAt - a.createdAt);
         renderOrder();
     })
     .catch((err) => {
