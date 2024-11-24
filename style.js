@@ -8,6 +8,7 @@ init()
 // 取得產品資料>渲染產品>選單篩選
 // 取得產品資料
 let productData = [];
+let product
 function getProduct(){
     axios.get(`${customerApi}/products`)
     .then((res) => {
@@ -25,10 +26,14 @@ const productWrap = document.querySelector('.productWrap');
 function renderProduct(data){
     let str = '';
     data.forEach(item => {
+
+        // 判斷商品是否已經加入購物車，為它將上disabled
+        const isDisabled = cartProductId.includes(item.id);
+
         str += `<li class="productCard">
                 <h4 class="productType">新品</h4>
                 <img src="${item.images}" alt="">
-                <a href="#" class="addCardBtn" data-id="${item.id}">加入購物車</a>
+                <a href="#" class="addCardBtn ${isDisabled ? 'disabled' : ''}" data-id="${item.id}" ${isDisabled ? 'disabled' : ''}>加入購物車</a>
                 <h3>${item.title}</h3>
                 <del class="originPrice">NT$${formatNumber(item.origin_price)}</del>
                 <p class="nowPrice">NT$${formatNumber(item.price)}</p>
@@ -56,12 +61,16 @@ function filterProduct(){
 // 取得購物車資料>渲染購物車>加入購物車>渲染購物車
 // 取得購物車資料
 let cartData = [];
+let cartProductId = []; // 已加入購物車商品的 ID
 let finalTotal = 0;
 function getCart(){
     axios.get(`${customerApi}/carts`)
     .then((res) => {
         cartData = res.data.carts;
         finalTotal = res.data.finalTotal;
+        
+        cartProductId = cartData.map(item => item.product.id); //
+        renderProduct(productData);  // 重新渲染產品資料，更新按鈕狀態
         renderCart();
     
     })
@@ -73,7 +82,7 @@ function getCart(){
 // 加入購物車
 productWrap.addEventListener('click', (e) => {
     e.preventDefault();
-    if (e.target.classList.contains('addCardBtn')){
+    if (e.target.classList.contains('addCardBtn') && !e.target.classList.contains('disabled')) {
         // 加入購物車時disabled
         e.target.classList.add('disabled');
         e.target.setAttribute('disabled', 'true');
@@ -91,6 +100,10 @@ function addCart(id){
       .then((res) => {
           cartData = res.data.carts;
           finalTotal = res.data.finalTotal;
+
+          cartProductId = cartData.map(item => item.product.id); //
+          renderProduct(productData);  // 重新渲染產品資料，更新按鈕狀態
+          
           renderCart();
 
         // sweetalert2
